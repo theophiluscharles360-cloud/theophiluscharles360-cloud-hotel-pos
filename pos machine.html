@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hotel POS - MALI HOTEL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {box-sizing:border-box; font-family:Arial;}
+body {background:#f4f4f4; margin:0; padding:10px;}
+.container {display:flex; gap:15px; flex-wrap:wrap;}
+.menu {flex:2; background:white; padding:15px; border-radius:10px;}
+.cart {flex:1; background:white; padding:15px; border-radius:10px; position:sticky; top:10px;}
+.item {background:#E50914; color:white; padding:15px; margin:8px; border-radius:8px; cursor:pointer; text-align:center;}
+.item:hover {opacity:0.8;}
+.btn {background:#28a745; color:white; padding:12px; border:none; border-radius:8px; width:100%; font-size:16px; cursor:pointer; margin-top:10px;}
+.total {font-size:24px; font-weight:bold; color:#E50914;}
+.header {background:#0a0a0a; color:white; padding:15px; text-align:center; margin-bottom:15px; border-radius:10px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>🏨 MALI HOTEL POS</h1>
+<p>Table: <input id="table" placeholder="Table 5" style="padding:5px"></p>
+</div>
+
+<div class="container">
+<!-- MENU -->
+<div class="menu">
+<h2>FOOD & DRINKS</h2>
+<div style="display:grid; grid-template-columns:repeat(3,1fr)">
+<div class="item" onclick="addItem('Ugali + Nyama', 450)">Ugali + Nyama<br><b>KSH 450</b></div>
+<div class="item" onclick="addItem('Chips Masala', 250)">Chips Masala<br><b>KSH 250</b></div>
+<div class="item" onclick="addItem('Pilau', 300)">Pilau<br><b>KSH 300</b></div>
+<div class="item" onclick="addItem('Soda 500ml', 80)">Soda 500ml<br><b>KSH 80</b></div>
+<div class="item" onclick="addItem('Water', 50)">Water<br><b>KSH 50</b></div>
+<div class="item" onclick="addItem('Beer', 250)">Beer<br><b>KSH 250</b></div>
+</div>
+</div>
+
+<!-- CART -->
+<div class="cart">
+<h2>🧾 CURRENT ORDER</h2>
+<div id="cartItems">No items</div>
+<hr>
+<h3>Total: <span class="total" id="total">KSH 0</span></h3>
+<button class="btn" onclick="payCash()">PAY CASH</button>
+<button class="btn" style="background:#E50914" onclick="payMpesa()">PAY M-PESA</button>
+<button class="btn" style="background:gray" onclick="printReceipt()">PRINT RECEIPT</button>
+</div>
+</div>
+
+<script>
+let cart = [];
+let total = 0;
+
+function addItem(name, price){
+    cart.push({name, price});
+    total += price;
+    updateCart();
+}
+
+function updateCart(){
+    let html = '';
+    cart.forEach((item, i) => {
+        html += `<p>${item.name} - KSH ${item.price} <button onclick="removeItem(${i})">X</button></p>`;
+    });
+    document.getElementById('cartItems').innerHTML = html || 'No items';
+    document.getElementById('total').innerText = 'KSH ' + total;
+}
+
+function removeItem(i){
+    total -= cart[i].price;
+    cart.splice(i,1);
+    updateCart();
+}
+
+function payCash(){
+    alert('Paid KSH ' + total + ' CASH. Receipt ready.');
+    saveSale('CASH');
+    cart=[]; total=0; updateCart();
+}
+
+function payMpesa(){
+    let phone = prompt('Enter customer M-PESA number 2547...');
+    alert('STK Sent to ' + phone + ' for KSH ' + total);
+    saveSale('M-PESA');
+    cart=[]; total=0; updateCart();
+}
+
+function printReceipt(){
+    let table = document.getElementById('table').value || 'Takeaway';
+    let receipt = `MALI HOTEL\nTable: ${table}\n---\n`;
+    cart.forEach(item => receipt += `${item.name} ${item.price}\n`);
+    receipt += `---\nTOTAL: KSH ${total}\nThank you!`;
+    alert(receipt);
+}
+
+function saveSale(method){
+    // Here you can send to Google Sheets or Database
+    console.log('Sale:', cart, total, method);
+}
+</script>
+</body>
+</html>
